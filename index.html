@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="icon.png" />
+  <title>فلش‌کارت انگلیسی</title>
+</head>
+<body>
+  <div class="container">
+    <h1>فلش‌کارت زبان انگلیسی</h1>
+
+    <input type="text" id="wordInput" placeholder="کلمه انگلیسی را وارد کنید..." />
+    <button onclick="translateWord()">ترجمه</button>
+    <button onclick="playPronunciation(wordInput.value)">🔊 تلفظ</button>
+
+    <div id="translation"></div>
+    <button onclick="saveWord()">ذخیره</button>
+
+    <h2>کلمات ذخیره‌شده</h2>
+    <ul id="wordList"></ul>
+
+    <hr />
+    <h2>بخش آزمون</h2>
+    <label><input type="radio" name="sourceType" value="all" checked> همه کلمات</label>
+    <label><input type="radio" name="sourceType" value="correct"> درست‌ها</label>
+    <label><input type="radio" name="sourceType" value="wrong"> غلط‌ها</label>
+    <br><br>
+    <label><input type="radio" name="quizMode" value="en2fa" checked> انگلیسی → فارسی</label>
+    <label><input type="radio" name="quizMode" value="fa2en"> فارسی → انگلیسی</label>
+    <br><br>
+    <button onclick="startQuiz()">شروع آزمون</button>
+
+    <div id="quizBox" style="display:none;">
+      <h3 id="quizQuestion"></h3>
+      <button onclick="showAnswer()">نمایش پاسخ</button>
+      <p id="quizAnswer" style="display:none;"></p>
+      <button onclick="markCorrect()">✅ درست</button>
+      <button onclick="markWrong()">❌ غلط</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
