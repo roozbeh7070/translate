@@ -32,6 +32,8 @@ function saveWord() {
   saved.push({ english, persian });
   localStorage.setItem("wordPairs", JSON.stringify(saved));
 
+  saveToGoogleSheets(english, persian, "saved");
+
   wordInput.value = "";
   translationDiv.innerText = "";
   delete translationDiv.dataset.translation;
@@ -39,6 +41,14 @@ function saveWord() {
   if (savedWordsSection.style.display === "block") {
     showSavedWords();
   }
+}
+
+function saveToGoogleSheets(english, persian, status = "saved") {
+  fetch("https://YOUR_SCRIPT_URL_HERE/exec", {
+    method: "POST",
+    body: JSON.stringify({ english, persian, status }),
+    headers: { "Content-Type": "application/json" }
+  }).then(res => console.log("Saved to Google Sheets"));
 }
 
 function toggleSavedWords() {
@@ -66,7 +76,7 @@ function playPronunciation(word) {
   const utterance = new SpeechSynthesisUtterance(word);
   utterance.lang = "en-US";
   utterance.rate = 0.9;
-  synth.cancel(); // برای جلوگیری از تداخل
+  synth.cancel();
   synth.speak(utterance);
 }
 
@@ -109,13 +119,21 @@ function showAnswer() {
   document.getElementById("quizAnswer").style.display = "block";
 }
 
+function playPronunciationFromQuiz() {
+  const item = currentQuizList[currentIndex];
+  if (!item) return;
+  const word = quizMode === "en2fa" ? item.english : item.persian;
+  playPronunciation(word);
+}
+
 function markCorrect() {
   const item = currentQuizList[currentIndex];
-  correctWords = correctWords.filter(i => i.english !== item.english); // حذف اگر قبلاً بوده
+  correctWords = correctWords.filter(i => i.english !== item.english);
   correctWords.push(item);
-  wrongWords = wrongWords.filter(i => i.english !== item.english); // از غلط‌ها حذف
+  wrongWords = wrongWords.filter(i => i.english !== item.english);
   localStorage.setItem("correctWords", JSON.stringify(correctWords));
   localStorage.setItem("wrongWords", JSON.stringify(wrongWords));
+  saveToGoogleSheets(item.english, item.persian, "correct");
   nextQuiz();
 }
 
@@ -126,6 +144,7 @@ function markWrong() {
   correctWords = correctWords.filter(i => i.english !== item.english);
   localStorage.setItem("wrongWords", JSON.stringify(wrongWords));
   localStorage.setItem("correctWords", JSON.stringify(correctWords));
+  saveToGoogleSheets(item.english, item.persian, "wrong");
   nextQuiz();
 }
 
