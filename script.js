@@ -1,6 +1,7 @@
 const wordInput = document.getElementById("wordInput");
 const translationDiv = document.getElementById("translation");
 const wordList = document.getElementById("wordList");
+const savedWordsSection = document.getElementById("savedWordsSection");
 
 let correctWords = JSON.parse(localStorage.getItem("correctWords") || "[]");
 let wrongWords = JSON.parse(localStorage.getItem("wrongWords") || "[]");
@@ -31,10 +32,22 @@ function saveWord() {
   saved.push({ english, persian });
   localStorage.setItem("wordPairs", JSON.stringify(saved));
 
-  showSavedWords();
   wordInput.value = "";
   translationDiv.innerText = "";
   delete translationDiv.dataset.translation;
+
+  if (savedWordsSection.style.display === "block") {
+    showSavedWords();
+  }
+}
+
+function toggleSavedWords() {
+  if (savedWordsSection.style.display === "none") {
+    savedWordsSection.style.display = "block";
+    showSavedWords();
+  } else {
+    savedWordsSection.style.display = "none";
+  }
 }
 
 function showSavedWords() {
@@ -49,9 +62,12 @@ function showSavedWords() {
 
 function playPronunciation(word) {
   if (!word) return;
+  const synth = window.speechSynthesis;
   const utterance = new SpeechSynthesisUtterance(word);
   utterance.lang = "en-US";
-  speechSynthesis.speak(utterance);
+  utterance.rate = 0.9;
+  synth.cancel(); // برای جلوگیری از تداخل
+  synth.speak(utterance);
 }
 
 // ---------------- آزمون ------------------
@@ -95,15 +111,21 @@ function showAnswer() {
 
 function markCorrect() {
   const item = currentQuizList[currentIndex];
+  correctWords = correctWords.filter(i => i.english !== item.english); // حذف اگر قبلاً بوده
   correctWords.push(item);
+  wrongWords = wrongWords.filter(i => i.english !== item.english); // از غلط‌ها حذف
   localStorage.setItem("correctWords", JSON.stringify(correctWords));
+  localStorage.setItem("wrongWords", JSON.stringify(wrongWords));
   nextQuiz();
 }
 
 function markWrong() {
   const item = currentQuizList[currentIndex];
+  wrongWords = wrongWords.filter(i => i.english !== item.english);
   wrongWords.push(item);
+  correctWords = correctWords.filter(i => i.english !== item.english);
   localStorage.setItem("wrongWords", JSON.stringify(wrongWords));
+  localStorage.setItem("correctWords", JSON.stringify(correctWords));
   nextQuiz();
 }
 
@@ -116,5 +138,3 @@ function nextQuiz() {
     showQuestion();
   }
 }
-
-showSavedWords();
